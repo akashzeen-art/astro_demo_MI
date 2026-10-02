@@ -1,0 +1,1 @@
+const e={title:"दक्षिणा",chooseTitle:"दक्षिणा चुनें",chooseHint:"अपना दक्षिणा पैकेज चुनें और मोबाइल नंबर दर्ज करें",packages:"दक्षिणा पैकेज",completeOrder:"दक्षिणा दें · ऑर्डर पूरा करें"};export{e as D};

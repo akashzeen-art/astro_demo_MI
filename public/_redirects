@@ -1,0 +1,4 @@
+/openai-proxy.php    /openai-proxy.php    200
+/openai-proxy         /openai-proxy        200
+/api/openai/*         /api/openai/:splat   200
+/*                    /index.html          200

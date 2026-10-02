@@ -1,0 +1,44 @@
+[build]
+  command = "npm install && npm run build"
+  publish = "dist"
+
+# Backend APIs (subscription, astro, knowlarity)
+[[redirects]]
+  from = "/api/astro/*"
+  to = "https://cookstudio.live/api/astro/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/payment/*"
+  to = "https://cookstudio.live/api/payment/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/knowlarity/*"
+  to = "https://cookstudio.live/api/knowlarity/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/ws"
+  to = "https://cookstudio.live/api/ws"
+  status = 200
+  force = true
+
+# SPA — keep OpenAI proxy paths on Netlify (use VITE_OPENAI_PROXY_URL worker if PHP unavailable)
+[[redirects]]
+  from = "/openai-proxy.php"
+  to = "/openai-proxy.php"
+  status = 200
+
+[[redirects]]
+  from = "/api/openai/*"
+  to = "/api/openai/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
