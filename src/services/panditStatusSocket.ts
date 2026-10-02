@@ -169,56 +169,9 @@ export function onCallWsStatus(
   return () => window.removeEventListener(CALL_WS_EVENT, handler);
 }
 
-/**
- * SockJS URL must be https:// (not ws/wss).
- * Production: always same-origin `/api/ws` so nginx + cookies work.
- * Local dev: hit UPSTREAM directly (Vite has no reliable SockJS proxy).
- */
+/** SockJS needs an https:// URL (not ws/wss); always the cookstudio.live endpoint */
 function resolveSockJsUrl(): string {
-  let url = (PANDIT_WS_CONFIG.SOCKJS_URL || "/api/ws").trim();
-
-  if (url.startsWith("wss://")) url = url.replace(/^wss:\/\//, "https://");
-  if (url.startsWith("ws://")) url = url.replace(/^ws:\/\//, "http://");
-
-  const { hostname, origin, protocol } = window.location;
-  const isLocal = hostname === "localhost" || hostname === "127.0.0.1";
-  const brandHosts = ["cookstudio.live", "myastrosutra.live"];
-  const pageHost = hostname.replace(/^www\./i, "");
-
-  // Absolute override from env
-  if (url.startsWith("http://") || url.startsWith("https://")) {
-    try {
-      const target = new URL(url);
-      const targetHost = target.hostname.replace(/^www\./i, "");
-      // On live brand domains, never cross-origin SockJS (cookie_needed breaks it)
-      if (
-        brandHosts.includes(pageHost) &&
-        targetHost !== pageHost &&
-        !isLocal
-      ) {
-        const sameOrigin = `${origin}/api/ws`;
-        wsLog("forcing same-origin SockJS (was cross-origin)", {
-          page: origin,
-          configured: url,
-          using: sameOrigin,
-        });
-        return sameOrigin;
-      }
-    } catch {
-      // fall through
-    }
-    return url;
-  }
-
-  const path = url.startsWith("/") ? url : `/${url}`;
-
-  // Local Vite — talk to production API host directly
-  if (isLocal || import.meta.env.DEV) {
-    return `${PANDIT_WS_CONFIG.UPSTREAM.replace(/\/$/, "")}${path}`;
-  }
-
-  // Deployed site — same origin (https://this-host/api/ws)
-  return `${protocol}//${hostname}${path}`;
+  return PANDIT_WS_CONFIG.SOCKJS_URL;
 }
 
 function isSameOriginUrl(url: string): boolean {

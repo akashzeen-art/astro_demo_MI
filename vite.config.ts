@@ -13,10 +13,6 @@ export default defineConfig({
   define: {
     "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV || "development"),
     global: "globalThis",
-    __API_BASE_URL__: JSON.stringify(
-      process.env.VITE_API_BASE_URL ||
-      (process.env.NODE_ENV === "production" ? "/api/v1" : "http://localhost:8000/api/v1")
-    ),
   },
   esbuild: {
     // Keep console for websocket / runtime diagnostics in production
@@ -34,37 +30,6 @@ export default defineConfig({
     },
     watch: {
       usePolling: false,
-    },
-    proxy: {
-      // Subscription + one-time Pandit Ji call packs (portal 1015)
-      "/api/payment": {
-        target: "https://cookstudio.live",
-        changeOrigin: true,
-        secure: true,
-        timeout: 120_000,
-        proxyTimeout: 120_000,
-      },
-      // Birth profile / pandits / call-data (upstream can be slow — avoid proxy hang-up)
-      "/api/astro": {
-        target: "https://cookstudio.live",
-        changeOrigin: true,
-        secure: true,
-        timeout: 120_000,
-        proxyTimeout: 120_000,
-      },
-      // Knowlarity make-call
-      "/api/knowlarity": {
-        target: "https://cookstudio.live",
-        changeOrigin: true,
-        secure: true,
-        timeout: 120_000,
-        proxyTimeout: 120_000,
-      },
-      "/api": {
-        target: "http://localhost:8000",
-        changeOrigin: true,
-        secure: false,
-      },
     },
   },
   build: {

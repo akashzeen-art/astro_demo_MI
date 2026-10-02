@@ -1,1 +1,0 @@
-import{j as r}from"./query-DRx1qRJk.js";import{c as t}from"./utils-DPty63Bb.js";const m=({children:s,className:a=""})=>r.jsx("div",{className:t("sutra-card transition-all duration-300",a),children:s});export{m as G};

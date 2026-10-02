@@ -1,30 +1,15 @@
 import { BRAND } from "./brand";
 
-declare const __API_BASE_URL__: string;
+/**
+ * Every backend API is called directly on this domain (dev, preview and any
+ * deployed host). cookstudio.live returns CORS headers for all origins.
+ */
+export const API_DOMAIN = "https://cookstudio.live";
 
-function resolveApiBaseUrl(): string {
-  const built =
-    typeof __API_BASE_URL__ !== "undefined" ? __API_BASE_URL__ : "/api/v1";
-
-  if (typeof window === "undefined") {
-    return built;
-  }
-
-  const { hostname } = window.location;
-  const isLocalHost = hostname === "localhost" || hostname === "127.0.0.1";
-
-  // Phone on same Wi‑Fi hitting Vite dev server must not call localhost:8000
-  if (import.meta.env.DEV && !isLocalHost) {
-    return `http://${hostname}:8000/api/v1`;
-  }
-
-  return built;
-}
+const apiUrl = (path: string) => `${API_DOMAIN}${path}`;
 
 export const API_CONFIG = {
-  get BASE_URL() {
-    return resolveApiBaseUrl();
-  },
+  BASE_URL: apiUrl("/api/v1"),
   TIMEOUT: 120000,
   RETRY_ATTEMPTS: 3,
 } as const;
@@ -48,59 +33,41 @@ export const FEATURES = {
 } as const;
 
 export const PAYMENT_CONFIG = {
-  // Same-origin path — Vite proxies this in dev; production uses cookstudio.live nginx.
-  BASE_URL: import.meta.env.VITE_PAYMENT_API_URL || "/api/payment",
+  BASE_URL: apiUrl("/api/payment"),
   DEFAULT_PORTAL_ID: "93",
-  UPSTREAM: "https://cookstudio.live",
 } as const;
 
 /** One-time Pandit Ji call packs (portal 1015) — minutes → price from API, never hardcode. */
 export const CALL_PAYMENT_CONFIG = {
-  BASE_URL: import.meta.env.VITE_CALL_PAYMENT_API_URL || "/api/payment",
-  PORTAL_ID: import.meta.env.VITE_CALL_PORTAL_ID || "1015",
-  UPSTREAM: "https://cookstudio.live",
+  BASE_URL: apiUrl("/api/payment"),
+  PORTAL_ID: "1015",
 } as const;
 
 export const ASTRO_USER_CONFIG = {
-  // Same-origin in dev (Vite proxies /api/astro → cookstudio.live).
-  SAVE_USER_URL:
-    import.meta.env.VITE_ASTRO_SAVE_USER_URL || "/api/astro/saveuserdata",
-  GET_DATA_URL:
-    import.meta.env.VITE_ASTRO_GET_DATA_URL || "/api/astro/getdata",
-  CALL_DATA_URL:
-    import.meta.env.VITE_ASTRO_CALL_DATA_URL || "/api/astro/call-data",
-  PANDIT_ALL_URL:
-    import.meta.env.VITE_ASTRO_PANDIT_ALL_URL || "/api/astro/pandit/all",
-  /** GET /api/astro/pandit?mobile= — single Pandit Ji profile for pandit dashboard */
-  PANDIT_BY_MOBILE_URL:
-    import.meta.env.VITE_ASTRO_PANDIT_BY_MOBILE_URL || "/api/astro/pandit",
-  /** GET /api/astro/pandit/status?mobile=&status=AVAILABLE|BUSY|BREAK */
-  PANDIT_STATUS_URL:
-    import.meta.env.VITE_ASTRO_PANDIT_STATUS_URL || "/api/astro/pandit/status",
-  /** GET /api/astro/queue/cancel?agent=&customer= — leave queue before call joins */
-  QUEUE_CANCEL_URL:
-    import.meta.env.VITE_ASTRO_QUEUE_CANCEL_URL || "/api/astro/queue/cancel",
-  UPSTREAM: "https://cookstudio.live",
+  SAVE_USER_URL: apiUrl("/api/astro/saveuserdata"),
+  GET_DATA_URL: apiUrl("/api/astro/getdata"),
+  CALL_DATA_URL: apiUrl("/api/astro/call-data"),
+  PANDIT_ALL_URL: apiUrl("/api/astro/pandit/all"),
+  /** GET ?mobile= — single Pandit Ji profile for pandit dashboard */
+  PANDIT_BY_MOBILE_URL: apiUrl("/api/astro/pandit"),
+  /** GET ?mobile=&status=AVAILABLE|BUSY|BREAK */
+  PANDIT_STATUS_URL: apiUrl("/api/astro/pandit/status"),
+  /** GET ?agent=&customer= — leave queue before call joins */
+  QUEUE_CANCEL_URL: apiUrl("/api/astro/queue/cancel"),
 } as const;
 
 /** Knowlarity bridge call — agent = Pandit Ji phone, customer = user mobile. */
 export const KNOWLARITY_CONFIG = {
-  MAKE_CALL_URL:
-    import.meta.env.VITE_KNOWLARITY_MAKE_CALL_URL || "/api/knowlarity/make-call",
+  MAKE_CALL_URL: apiUrl("/api/knowlarity/make-call"),
   CONFIG_ID: Number(import.meta.env.VITE_KNOWLARITY_CONFIG_ID || 1),
 } as const;
 
-/**
- * STOMP over SockJS — Spring `/api/ws` with `.withSockJS()`.
- * Prefer same-origin `/api/ws` in production (nginx proxy). Absolute URL breaks
- * cross-domain (e.g. myastrosutra.live → .online) when cookie_needed=true.
- */
+/** STOMP over SockJS — Spring `/api/ws` with `.withSockJS()` */
 export const PANDIT_WS_CONFIG = {
-  SOCKJS_URL: import.meta.env.VITE_PANDIT_WS_URL || "/api/ws",
+  SOCKJS_URL: apiUrl("/api/ws"),
   STATUS_TOPIC: "/topic/pandit/status",
   /** Backend: messagingTemplate.convertAndSend("/topic/call/status", { mobile, status }) */
   CALL_STATUS_TOPIC: "/topic/call/status",
-  UPSTREAM: "https://cookstudio.live",
   RECONNECT_MS: 8_000,
 } as const;
 
